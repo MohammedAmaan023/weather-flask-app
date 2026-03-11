@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+<title>3D Weather App</title>
+<link rel="stylesheet" href="/static/style.css">
+</head>
+
+<body>
+
+<!-- Background star layers -->
+<div class="stars"></div>
+<div class="twinkling"></div>
+<div class="shooting-star"></div>
+
+<div class="weather-card">
+
+<h1>🌤 Weather App</h1>
+
+<div class="search-box">
+<input type="text" id="city" placeholder="Enter City Name">
+<button onclick="getWeather()">Check Weather</button>
+<button onclick="getLocationWeather()">📍 My Location</button>
+</div>
+
+<div id="result"></div>
+
+</div>
+
+<script>
+
+// Search weather by city
+function getWeather(){
+
+let city=document.getElementById("city").value;
+
+if(city===""){
+document.getElementById("result").innerHTML="Please enter a city name";
+return;
+}
+
+fetch(`/weather?city=${city}`)
+.then(response=>response.json())
+.then(data=>{
+
+if(data.error){
+
+document.getElementById("result").innerHTML="City not found";
+
+}
+
+else{
+
+document.getElementById("result").innerHTML=`
+
+<img src="https://openweathermap.org/img/wn/${data.icon}@2x.png">
+
+<h2>${data.city}</h2>
+
+<p>🌡 Temperature : ${data.temperature} °C</p>
+
+<p>💧 Humidity : ${data.humidity}%</p>
+
+<p>☁ Weather : ${data.description}</p>
+
+`;
+
+}
+
+});
+
+}
+
+
+// Get weather using GPS location
+function getLocationWeather(){
+
+navigator.geolocation.getCurrentPosition(function(position){
+
+let lat=position.coords.latitude;
+let lon=position.coords.longitude;
+
+fetch(`/weather-location?lat=${lat}&lon=${lon}`)
+.then(response=>response.json())
+.then(data=>{
+
+document.getElementById("result").innerHTML=`
+
+<img src="https://openweathermap.org/img/wn/${data.icon}@2x.png">
+
+<h2>${data.city}</h2>
+
+<p>🌡 Temperature : ${data.temperature} °C</p>
+
+<p>💧 Humidity : ${data.humidity}%</p>
+
+<p>☁ Weather : ${data.description}</p>
+
+`;
+
+});
+
+});
+
+}
+
+
+// Allow Enter key search
+document.getElementById("city").addEventListener("keypress", function(event){
+
+if(event.key==="Enter"){
+getWeather();
+}
+
+});
+
+</script>
+
+</body>
+
+</html>
